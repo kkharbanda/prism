@@ -19,7 +19,7 @@
                         </span>
                     </li>
                     <li>
-                        <router-link to="/user/dashboard">
+                        <router-link to="">
                             Dashboard
                         </router-link>
                     </li>
