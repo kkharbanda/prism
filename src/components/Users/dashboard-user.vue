@@ -1,4 +1,0 @@
-<template>
-USER DASHBOARD
-
-</template>

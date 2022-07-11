@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { msgError, msgSuccess } from '../../Tools/vuex'
+import { msgError, msgSuccess } from '../../Tools/vuex';
+import fbErrors from '../../Tools/fbcodes';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -23,7 +24,16 @@ const authModule = {
       user: DEFAULT_USER,
       auth: false,
     };
-  },
+  },getters:{
+    isAuth(state){
+        if(state.auth) { return true};
+        return false 
+    },
+    isAdmin(state){
+        if(state.user.isAdmin) { return true};
+        return false 
+    }
+},
   mutations: {
     setUser(state, payload) {
       state.user = {
@@ -31,9 +41,32 @@ const authModule = {
         ...payload,
       };
       state.auth = true;
-    },
+    },clearUser(state){
+      state.user = DEFAULT_USER;
+      state.auth = false;
+  }
   },
   actions: {
+    async signOut({commit}){
+      try{
+          await auth.signOut();
+          commit('clearUser');
+          msgSuccess(commit,'Bye :(');
+          router.push('/');
+      } catch(error){
+          msgError(commit);
+      }
+  },
+    async autosign({commit,dispatch},payload){
+      try {
+          const userData = await dispatch('getUserProfile',payload.uid);
+          commit('setUser', userData);
+          return true;
+      } catch(error){
+          msgError(commit);
+          console.log(error)
+      }
+  },
     async getUserProfile({ commit }, payload) {
       try {
         const docSnap = await getDoc(doc(db, "users", payload));
@@ -49,6 +82,7 @@ const authModule = {
     },
     async signin({ commit,dispatch }, payload) {
       try {
+        commit('notify/setLoading',true,{ root: true })
         const userCredential = await signInWithEmailAndPassword(
             auth,
             payload.email,
@@ -58,14 +92,18 @@ const authModule = {
         const userData = await dispatch('getUserProfile',userCredential.user.uid);
         commit('setUser',userData);
         router.push('/user/dashboard');
+        msgSuccess(commit);
     } catch(error){
-        console.log(error)
-        msgError(commit);
+      
+        msgError(commit,fbErrors(error.code));
+    }finally{
+      commit('notify/setLoading',false,{ root: true })
     }
     },
 
     async signup({ commit }, payload) {
       try {
+        commit('notify/setLoading',true,{ root: true })
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           payload.email,
@@ -80,8 +118,10 @@ const authModule = {
         commit("setUser", newUser);
         msgSuccess(commit);
       } catch (error) {
-        console.error(error);
-        msgError(commit);
+      
+        msgError(commit,fbErrors(error.code));
+      }finally{
+        commit('notify/setLoading',false,{ root: true })
       }
     },
   },

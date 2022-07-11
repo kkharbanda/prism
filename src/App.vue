@@ -1,19 +1,27 @@
 <template>
-  <appheader></appheader>
-  <router-view></router-view>
+   <appheader/>
+
+  <router-view v-if="!isLoadig"/>
+
+  <div class="page_loader" v-else>
+    <app-loader/>
+  </div>
 </template>
 
 <script>
 import appheader from './components/Header/Header-view'
+import appLoader from './components/Utils/app-loader.vue';
 import { mapGetters } from 'vuex';
 export default {
   components: {
-    appheader
+    appheader,
+    appLoader
   },
 
   computed: {
     ...mapGetters({
-      toastMsg: 'notify/getToastMsg'
+      toastMsg: 'notify/getToastMsg',
+      isLoadig:'notify/isLoading'
     })
   },
   watch: {
