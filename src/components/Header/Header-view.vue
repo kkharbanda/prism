@@ -3,6 +3,7 @@
         <div class="container header_container">
             <div class="logo">
                 <router-link to="/">
+
                     Prism
                 </router-link>
             </div>
@@ -34,16 +35,15 @@
 <script>
 import { mapGetters } from 'vuex'
 
-
 export default {
-    computed:{
+    computed: {
         ...mapGetters({
-            isAuth:'auth/isAuth',
-            isAdmin:'auth/isAdmin'
+            isAuth: 'auth/isAuth',
+            isAdmin: 'auth/isAdmin'
         })
     },
-    methods:{
-        logoutUser(){
+    methods: {
+        logoutUser() {
             this.$store.dispatch('auth/signOut');
         }
     }

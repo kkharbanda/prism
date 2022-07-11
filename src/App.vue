@@ -11,11 +11,13 @@
 <script>
 import appheader from './components/Header/Header-view'
 import appLoader from './components/Utils/app-loader.vue';
+
 import { mapGetters } from 'vuex';
 export default {
   components: {
     appheader,
-    appLoader
+    appLoader,
+   
   },
 
   computed: {
