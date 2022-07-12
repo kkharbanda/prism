@@ -28,14 +28,14 @@
                             <li class="nav-item">
                                 <router-link class="nav-link" :to="{ name: 'admin_articles' }">
                                   <ProfileOutlined/>
-                                    Articles
+                                    Blogs
                                 </router-link>
                             </li>
                             <li class="nav-item">
                                  
                                 <router-link class="nav-link" :to="{ name: 'admin_add' }">
                                 <FileAddOutlined/>
-                                    Add article
+                                    Add Blogs
                                 </router-link>
                             </li>
                         </ul>
