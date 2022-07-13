@@ -1,46 +1,117 @@
 /* eslint-disable */
-import { msgSuccess, msgError } from '../../Tools/vuex';
-import { doc, setDoc, collection,serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebase';
-import router from '../../routes';
+import { msgSuccess, msgError } from "../../Tools/vuex";
+import {
+  doc,
+  setDoc,
+  getDocs,
+  collection,
+  serverTimestamp,
+  limit,
+  orderBy,
+  startAfter,
+  query,
+} from "firebase/firestore";
+import { db } from "../../firebase";
+import router from "../../routes";
 
-
-let articlesCol = collection(db,'articles') 
-
+let articlesCol = collection(db, "articles");
 
 const articlesModule = {
-    namespaced: true,
-    state(){
-        return {
-
-        }
+  namespaced: true,
+  state() {
+    return {
+      adminArticles: "",
+      adminLastVisible: "",
+    };
+  },
+  getters: {
+    getAdminArticles(state) {
+      return state.adminArticles;
     },
-    actions:{
-        async addArticle({commit,rootGetters},payload){
-            try{
-                const user = rootGetters['auth/getUserData'];
-                const newArticle = doc(articlesCol);
-                await setDoc(newArticle,{
-                    timestamp:serverTimestamp(),
-                    owner:{
-                        uid: user.uid,
-                        firstname: user.firstname,
-                        lastname: user.lastname
-                    },
-                    ...payload
-                });
-                router.push({name:'admin_articles'})
-                msgSuccess(commit,'Congratulations')
-            } catch(error){
-                msgError(commit);
-                console.log(error)
-            }
+    getLastVisible(state) {
+      return state.adminLastVisible;
+    },
+  },
+  mutations: {
+    setAdminArticles(state, articles) {
+      state.adminArticles = articles;
+    },
+    setAdminLastVisible(state, payload) {
+      state.adminLastVisible = payload;
+    },
+  },
+  actions: {
+    async addArticle({ commit, rootGetters }, payload) {
+      try {
+        const user = rootGetters["auth/getUserData"];
+        const newArticle = doc(articlesCol);
+        await setDoc(newArticle, {
+          timestamp: serverTimestamp(),
+          owner: {
+            uid: user.uid,
+            firstname: user.firstname,
+            lastname: user.lastname,
+          },
+          ...payload,
+        });
+        router.push({ name: "admin_articles" });
+        msgSuccess(commit, "Congratulations");
+      } catch (error) {
+        msgError(commit);
+        console.log(error);
+      }
+    },
+    async loadmorearticles({ commit, getters }, payload) {
+        try {
+          if (getters.getLastVisible) {
+            let oldArticles = getters.getAdminArticles;
+  
+            const q = query(
+              articlesCol,
+              orderBy("timestamp", "desc"),
+              startAfter(getters.getLastVisible),
+              limit(payload.limit)
+            );
+            const querySnapshot = await getDocs(q);
+            const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+            const newArticles = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+  
+            commit("setAdminArticles", [...oldArticles, ...newArticles]);
+            commit("setAdminLastVisible", lastVisible);
+          }
+        } catch (error) {
+          msgError(commit, "Opp,try again later");
         }
+      },
+    async getAdminArticles({ commit }, payload) {
+      try {
+        const q = query(
+          articlesCol,
+          orderBy("timestamp", "desc"),
+          limit(payload.limit)
+        );
+        const querySnapshot = await getDocs(q);
+
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        const articles = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        commit("setAdminArticles", articles);
+        commit("setAdminLastVisible", lastVisible);
+      } catch (error) {
+        console.log(error);
+      }
     }
-}
+   
+  },
+};
 
 export default articlesModule;
-
 
 // const obj = {
 //     id:'1238635252',
