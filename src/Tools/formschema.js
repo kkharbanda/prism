@@ -21,8 +21,12 @@ img:yup.string()
     .url('use correct url..')
     .required('The excerpt is required')
 }
-
+const addProfileSchema ={
+    firstname : yup.string().required("Please enter your firstname"),
+    lastname:yup.string()
+}
 
 export {
-    addArticleSchema
+    addArticleSchema,
+    addProfileSchema
 }

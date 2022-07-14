@@ -7,12 +7,13 @@ import store from './Store';
 import Home from './components/Home/home-view';
 import Article from './components/Articles/article-view';
 import Signin from './components/Users/sign-in';
-
+import NotFound from './components/Not-Found.vue';
 import dashboard from './components/Users/Dashboard/dashboard-user';
 import UserMain from './components/Users/Dashboard/main-app.vue';
 import UserProfile from './components/Users/Dashboard/Pages/user_profile.vue';
 import AdminArticles from './components/Users/Dashboard/Admin/articles-app.vue';
 import AdminAddArticles from './components/Users/Dashboard/Admin/add-app.vue';
+
 
 
 
@@ -28,7 +29,9 @@ const routes = createRouter({
             { path:'profile', component: UserProfile ,name:'user_profile'},
             { path:'articles', component: AdminArticles ,name:'admin_articles'},
             { path:'articles/add', component: AdminAddArticles ,name:'admin_add'},
-        ]}
+            
+        ]},
+        { path: '/:notFound(.*)*', component: NotFound,name:'404'}
     ]
 })
 const auth = getAuth();

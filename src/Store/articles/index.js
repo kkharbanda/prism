@@ -2,7 +2,9 @@
 import { msgSuccess, msgError } from "../../Tools/vuex";
 import {
   doc,
+  deleteDoc,
   setDoc,
+  getDoc,
   getDocs,
   collection,
   serverTimestamp,
@@ -22,6 +24,7 @@ const articlesModule = {
     return {
       adminArticles: "",
       adminLastVisible: "",
+      homearticles :""
     };
   },
   getters: {
@@ -31,6 +34,9 @@ const articlesModule = {
     getLastVisible(state) {
       return state.adminLastVisible;
     },
+    getHomeArticles(state){
+      return state.homearticles;
+    }
   },
   mutations: {
     setAdminArticles(state, articles) {
@@ -39,8 +45,38 @@ const articlesModule = {
     setAdminLastVisible(state, payload) {
       state.adminLastVisible = payload;
     },
+    setHomeArticles(state,payload){
+      state.homearticles = payload
+    }
   },
   actions: {
+
+    async getArticle({commit},payload){
+      try{
+          const docSnap = await getDoc(doc(db,'articles',payload));
+
+          if(docSnap.exists()) {
+              return docSnap.data();
+          } else {
+              return null
+          }
+      }catch(error){
+          msgError(commit)
+      }
+  },
+  async getArticles({commit},payload){
+      try {
+          const q = query(articlesCol, orderBy('timestamp','desc'),limit(payload.limit));
+          const querySnapshot = await getDocs(q);
+          const articles = querySnapshot.docs.map( doc => ({
+              id: doc.id,
+              ...doc.data()
+          }));
+          commit("setHomeArticles",articles);
+      } catch(error){
+          msgError(commit,error)
+      }
+  },
     async addArticle({ commit, rootGetters }, payload) {
       try {
         const user = rootGetters["auth/getUserData"];
@@ -62,30 +98,30 @@ const articlesModule = {
       }
     },
     async loadmorearticles({ commit, getters }, payload) {
-        try {
-          if (getters.getLastVisible) {
-            let oldArticles = getters.getAdminArticles;
-  
-            const q = query(
-              articlesCol,
-              orderBy("timestamp", "desc"),
-              startAfter(getters.getLastVisible),
-              limit(payload.limit)
-            );
-            const querySnapshot = await getDocs(q);
-            const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-            const newArticles = querySnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-  
-            commit("setAdminArticles", [...oldArticles, ...newArticles]);
-            commit("setAdminLastVisible", lastVisible);
-          }
-        } catch (error) {
-          msgError(commit, "Opp,try again later");
+      try {
+        if (getters.getLastVisible) {
+          let oldArticles = getters.getAdminArticles;
+
+          const q = query(
+            articlesCol,
+            orderBy("timestamp", "desc"),
+            startAfter(getters.getLastVisible),
+            limit(payload.limit)
+          );
+          const querySnapshot = await getDocs(q);
+          const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+          const newArticles = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          commit("setAdminArticles", [...oldArticles, ...newArticles]);
+          commit("setAdminLastVisible", lastVisible);
         }
-      },
+      } catch (error) {
+        msgError(commit, "Opp,try again later");
+      }
+    },
     async getAdminArticles({ commit }, payload) {
       try {
         const q = query(
@@ -106,8 +142,22 @@ const articlesModule = {
       } catch (error) {
         console.log(error);
       }
-    }
-   
+    },
+
+    async removeById({ commit, state }, payload) {
+      try {
+        await deleteDoc(doc(db, "articles", payload));
+
+        const newList = state.adminArticles.filter((x) => {
+          return x.id != payload;
+        });
+
+        commit("setAdminArticles", newList);
+        msgSuccess(commit, "Articles deleted !!");
+      } catch (error) {
+        msgError(commit, error);
+      }
+    },
   },
 };
 

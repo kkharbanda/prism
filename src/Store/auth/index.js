@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { db, auth } from "../../firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc,updateDoc  } from "firebase/firestore";
 import router from '../../routes';
 
 const DEFAULT_USER = {
@@ -35,6 +35,9 @@ const authModule = {
     },
     getUserData(state){
       return state.user;
+  },
+  getUserId(state){
+      return state.user.uid
   }
 },
   mutations: {
@@ -50,6 +53,28 @@ const authModule = {
   }
   },
   actions: {
+    async updateProfile({commit,getters},payload){
+      try{
+          const userRef = doc(db,'users',getters.getUserId);
+          const userData = getters.getUserData;
+
+          if(
+              payload.firstname === userData.firstname &&
+              payload.lastname === userData.lastname
+          ){
+              msgError(commit,'You didn`t update anything')
+              return false
+          }
+          await updateDoc(userRef,{
+              ...payload
+          });
+
+          commit('setUser',payload);
+          msgSuccess(commit,'Updated');
+      } catch(error){
+          msgError(commit,error);
+      }
+  },
     async signOut({commit}){
       try{
           await auth.signOut();

@@ -1,8 +1,8 @@
 <template>
-    <div class="container-fluid p_top article_page" v-if="article">
+    <div class="container p_top article_page" v-if="article">
 
             <div class="game_tag">
-                {{ article.game }}
+                {{ article.name }}
             </div>
 
             <div
@@ -33,25 +33,23 @@
 
 
 <script>
+
 export default {
     data(){
         return {
-            article:{
-                id:'1238635252',
-                owner:{
-                    firstname:'Francis',
-                    lastname:'Jones',
-                    uid:'kjdbciue0998323'
-                },
-                game:'The last of us 2',
-                title:'Lorem ipsum dolor sit amet, consectetur',
-                rating:5,
-                timestamp:'01/01/01',
-                img:'https://via.placeholder.com/150/000000/FFFFFF/',
-                excerpt:'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-                editor:'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'
-            }
+            article:null
         }
+    },
+    mounted(){
+        this.$store.dispatch('articles/getArticle',this.$route.params.id)
+        .then((article)=>{
+            if(article){
+                this.article = article;
+            } else {
+                this.$router.push({name:'404'});
+            }
+        })
     }
 }
+
 </script>

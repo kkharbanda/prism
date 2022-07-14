@@ -33,6 +33,12 @@
                <button class="btn btn-danger btn-sm">Delete article</button>
             </a-popconfirm>
          </template>
+         <template #Update="{ record }">
+            <router-link :to="{ name: 'admin_add', params: { id: record.id } }" target="_blank">
+               <button class="btn btn-primary btn-sm"> Update blogs</button>
+            </router-link>
+
+         </template>
          <template #title>
             <router-link :to="{ name: 'admin_add' }" target="_blank">
                <button class="btn btn-secondary"> Add blogs</button>
@@ -41,7 +47,7 @@
 
       </a-table>
       <br />
-      <button class="btn btn-secondary" @click="loadmorearticles({limit:1})"> Load More Articles</button>
+      <button class="btn btn-secondary" @click="loadmorearticles({ limit: 1 })"> Load More Articles</button>
 
    </div>
 
@@ -75,11 +81,9 @@ export default {
    methods: {
       ...mapActions('articles', [
          'getAdminArticles',
-         'loadmorearticles'
-      ]),
-      removeById(id) {
-         console.log(id)
-      }
+         'loadmorearticles',
+         'removeById'
+      ])
    }
 }
 
@@ -103,7 +107,12 @@ const columns = [
    {
       title: '',
       slots: { customRender: 'delete' }
+   },
+   {
+      title: 'Edit',
+      slots: { customRender: 'Update' }
    }
+
 ]
 
 

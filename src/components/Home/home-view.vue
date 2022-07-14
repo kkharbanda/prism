@@ -1,29 +1,33 @@
 <template>
-    <div class="container-fluid">
-        <app-carrousel :slides ="homearticles" />
-        <apphomecard :articles = "homearticles" />
+    <div class="container">
+        <app-carousel :slides="slidesArticles"/>
+        <app-featured :articles="homeArticles"/>
     </div>
 </template>
 
 <script>
-import appCarrousel from '../Utils/app-carousal.vue';
-import apphomecard from './feautured-view.vue'
+import appCarousel from '../Utils/app-carousal.vue';
+import appFeatured from './feautured-view.vue';
+
 export default {
-    components: {
-        appCarrousel,
-        apphomecard
+    components:{
+        appCarousel,
+        appFeatured
     },
-    data() {
-        return {
-            homearticles: [
-                { id: 1 },
-                { id: 2 },
-                { id: 3 },
-                { id: 4 },
-                { id: 5 },
-                { id: 6 },
-            ]
+    computed:{
+        homeArticles(){
+            return this.$store.getters['articles/getHomeArticles'];
+        },
+        slidesArticles(){
+            const articles = this.$store.getters['articles/getHomeArticles'];
+            const slicedArray = articles.slice(0,4);
+            return slicedArray;
         }
+    },
+    mounted(){
+        this.$store.dispatch('articles/getArticles',{limit:8});
     }
+
 }
+
 </script>
