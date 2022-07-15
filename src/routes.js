@@ -13,7 +13,7 @@ import UserMain from './components/Users/Dashboard/main-app.vue';
 import UserProfile from './components/Users/Dashboard/Pages/user_profile.vue';
 import AdminArticles from './components/Users/Dashboard/Admin/articles-app.vue';
 import AdminAddArticles from './components/Users/Dashboard/Admin/add-app.vue';
-
+import AdminEditArticles from './components/Users/Dashboard/Admin/articles-edit.vue';
 
 
 
@@ -29,8 +29,10 @@ const routes = createRouter({
             { path:'profile', component: UserProfile ,name:'user_profile'},
             { path:'articles', component: AdminArticles ,name:'admin_articles'},
             { path:'articles/add', component: AdminAddArticles ,name:'admin_add'},
+            {path:'/articles/edit/:id',component:AdminEditArticles,name:'admin_edit'},
             
         ]},
+       
         { path: '/:notFound(.*)*', component: NotFound,name:'404'}
     ]
 })

@@ -34,7 +34,7 @@
             </a-popconfirm>
          </template>
          <template #Update="{ record }">
-            <router-link :to="{ name: 'admin_add', params: { id: record.id } }" target="_blank">
+            <router-link :to="{ name: 'admin_edit', params: { id: record.id } }" target="_blank">
                <button class="btn btn-primary btn-sm"> Update blogs</button>
             </router-link>
 

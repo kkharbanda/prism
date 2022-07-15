@@ -33,27 +33,40 @@
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-
 export default {
-    components: {
-        EditorContent
-    },
-    data() {
-        return {
-            editor: null,
-        }
-    },
-    mounted() {
-        this.editor = new Editor({
-            content: '',
-            extensions: [
-                StarterKit,
-            ],
-           
+    props:['content'],
+   components:{
+       EditorContent
+   },
+   data(){
+       return {
+          editor: null,
+       }
+   },
+   watch:{
+       content(){
+           this.loadContent();
+       }
+   },
+   methods:{
+       loadContent(){
+            if(this.content){
+                this.editor.commands.setContent(this.content);
+                this.$emit('update',this.editor.getHTML());
+            }
+       }
+   },
+   mounted() {
+    this.editor = new Editor({
+      content: '',
+        extensions: [
+            StarterKit,
+        ],
         onUpdate:()=>{
             this.$emit('update',this.editor.getHTML());
         }
-        })
-    },
+    });
+    this.loadContent();
+  },
 }
 </script>
